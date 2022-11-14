@@ -1,0 +1,82 @@
+@device-width: 375;
+@rem: (@device-width/10rem);
+@vw: (100vw/@device-width);
+// font-size: (24/@rem);
+// font-size: 18*@vw;
+
+.app {
+  margin-bottom: 0;
+  /* stylelint-disable-next-line function-no-unknown */
+  margin-bottom: constant(safe-area-inset-bottom);
+  margin-bottom: env(safe-area-inset-bottom);
+  height: 100%;
+  background-color: #000000;
+
+  .topContent {
+    width: 100vw;
+    height: 30%;
+
+    .inputValContent {
+      padding: 0 12*@vw;
+      width: 100%;
+      font-size: 50*@vw;
+      text-align: right;
+      box-sizing: border-box;
+      color: #FFFFFF;
+    }
+  }
+
+  .bottomContent {
+    display: grid;
+    padding: 0 5vw;
+    width: 90vw;
+    height: 70%;
+    grid-template-rows: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 18*@vw 18*@vw;
+
+    .keyItem {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      font-size: 28*@vw;
+      color: #FFFFFF;
+
+      .keyItemContent {
+        position: relative;
+        border-radius: 50%;
+        padding-bottom: 100%;
+        width: 100%;
+        height: 0;
+        background-color: #919090;
+
+        &.keyItemBaseFunction {
+          background-color: #FDAE4C;
+        }
+
+        &.keyItemFunction {
+          color: #000000;
+          background-color: #EDECEA;
+        }
+
+        &:active {
+          color: #000000;
+          background-color: #FFFFFF;
+        }
+
+        .keyText {
+          position: absolute;
+          top: 0;
+          left: 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+          height: 100%;
+        }
+      }
+    }
+  }
+}
