@@ -21,8 +21,9 @@
     .historyContent {
       display: flex;
       justify-content: flex-end;
+      overflow-y: scroll;
       padding: 12*@vw;
-      flex: 1;
+      height: calc(100% - 60*@vw);
       flex-direction: column;
 
       .historyItem {
@@ -34,12 +35,23 @@
     }
 
     .inputValContent {
+      flex-basis: 60*@vw;
+      overflow-x: scroll;
       padding: 0 12*@vw;
       width: 100%;
       font-size: 50*@vw;
       text-align: right;
-      box-sizing: border-box;
+      white-space: nowrap;
       color: #FFFFFF;
+      box-sizing: border-box;
+
+      &.fontSmall {
+        font-size: 25*@vw;
+      }
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
     }
   }
 

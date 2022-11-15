@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import styles from './App.module.less';
-import { formateNumber } from './utils/tools';
+import { formateNumber, calcHandler } from './utils/tools';
+import moment from 'moment';
 
 const backKey = '🔙';
 
@@ -30,79 +31,19 @@ const baseOperator = ['/', '+', '-', 'X'];
 const baseFunctionKey = [backKey, ...baseOperator, '='];
 const functionKey = ['AC', '+/-', '%'];
 
-type CalcType = 'calculate' | 'inputting';
+type CalcType = 'calculate' | 'inputting' | 'result';
+interface HistoryItem {
+  type: 'result';
+  createTime: string;
+  content: string;
+}
 
 function App() {
   const [inputVal, setInputVal] = useState('0');
-  const [historyArr, setHistoryArr] = useState<string[]>([]);
+  const [historyArr, setHistoryArr] = useState<HistoryItem[]>([]);
   const [operator, setOperator] = useState('');
   const [calcType, setCalcType] = useState<CalcType>('inputting');
-
-  /**
-   * 计算出最终结果
-   * 一、将数字和运算符分开
-   * 二、将所有的乘除运算计算完
-   * 三、将所有的加减运算计算完，得到最终结果
-   * @param str
-   * @returns
-   */
-  const calcHandler = (str: string) => {
-    let i = 0;
-    let len = str.length;
-    // 所有数字
-    let numbers = [];
-    // 所有操作符
-    let operatorArr = [];
-    let regNumber = /\d/;
-    let numberItem = '';
-    while (i < len) {
-      if (regNumber.test(str[i])) {
-        numberItem += str[i];
-        if (i === len - 1) {
-          numbers.push(Number(numberItem));
-        }
-      } else {
-        numbers.push(Number(numberItem));
-        operatorArr.push({ type: str[i], index: operatorArr.length });
-        numberItem = '';
-      }
-      i++;
-    }
-
-    // 将乘除运算计算完，依次删除数字数组的位数和运算符数组的位数
-    let k = 0;
-    let oldLen = operatorArr.length;
-    while (k < operatorArr.length) {
-      let index = operatorArr[k].index - (oldLen - operatorArr.length);
-      if (operatorArr[k].type === 'X') {
-        numbers[index] = Number(
-          formateNumber(numbers[index] * numbers[index + 1])
-        );
-        operatorArr.splice(k, 1);
-        numbers.splice(index + 1, 1);
-      } else if (operatorArr[k].type === '/') {
-        numbers[index] = Number(
-          formateNumber(numbers[index] / numbers[index + 1])
-        );
-        operatorArr.splice(k, 1);
-        numbers.splice(index + 1, 1);
-      } else {
-        k++;
-      }
-    }
-
-    let result = numbers[0];
-    for (let l = 1; l < numbers.length; l++) {
-      const type = operatorArr[l - 1].type;
-      if (type === '+') {
-        result = Number(formateNumber(result + numbers[l]));
-      } else if (type === '-') {
-        result = Number(formateNumber(result - numbers[l]));
-      }
-    }
-    console.log('result', result);
-    return result;
-  };
+  const contentRef = useRef<HTMLDivElement>(null);
 
   /**
    * 计算结果
@@ -110,7 +51,7 @@ function App() {
    * @returns
    */
   const baseToolHandler = (allInput: string): string => {
-    if (/\+|-|\*|\//.test(allInput)) {
+    if (/\+|-|X|\//.test(allInput)) {
       let formateStr = allInput.replace(/\s/g, '');
       return calcHandler(formateStr).toString();
     } else {
@@ -121,8 +62,6 @@ function App() {
   const numberTool = (str: string) => {
     if (baseOperator.includes(str)) {
       setCalcType('calculate');
-      setOperator(str);
-      // setHistoryArr([...historyArr, `${inputVal} ${str} `]);
       if (calcType === 'inputting') {
         setInputVal(`${inputVal} ${str} `);
       }
@@ -131,18 +70,55 @@ function App() {
     if (str === '=') {
       if (calcType === 'inputting') {
         const result = baseToolHandler(inputVal);
+        setHistoryArr([
+          ...historyArr,
+          {
+            type: 'result',
+            createTime: moment().format('YYYY-MMMM-DD , hh:mm:ss'),
+            content: `${inputVal} = ${result}`,
+          },
+        ]);
+        setCalcType('result');
         setInputVal(result);
       }
-    } else if (/\d/.test(str)) {
-      setInputVal((inputVal + str).replace(/^0/g, ''));
+    } else if (/\d|\./.test(str)) {
+      if (calcType === 'result') {
+        setInputVal(str);
+      } else {
+        if (/^0\./.test(inputVal + str)) {
+          setInputVal(inputVal + str);
+        } else {
+          setInputVal((inputVal + str).replace(/^0/g, ''));
+        }
+      }
       setCalcType('inputting');
     } else if (str === 'AC') {
       setCalcType('inputting');
       setInputVal('0');
     } else if (calcType === 'inputting' && str === '+/-') {
-      setInputVal(formateNumber(Number(inputVal) * -1));
+      const lastIndex = inputVal.lastIndexOf(' ');
+      let value = inputVal;
+      let prefix = '';
+      if (lastIndex > -1) {
+        value = inputVal.slice(lastIndex + 1);
+        value = formateNumber(Number(value) * -1);
+        prefix = inputVal.slice(0, lastIndex + 1);
+      } else {
+        value = formateNumber(Number(value) * -1);
+      }
+      setInputVal(`${prefix}${value}`);
     } else if (calcType === 'inputting' && str === '%') {
-      setInputVal(formateNumber(Number(inputVal) / 100));
+      const lastIndex = inputVal.lastIndexOf(' ');
+      let value = inputVal;
+      let prefix = '';
+      if (lastIndex > -1) {
+        value = inputVal.slice(lastIndex + 1);
+        value = formateNumber(Number(value) / 100);
+        prefix = inputVal.slice(0, lastIndex + 1);
+      } else {
+        value = formateNumber(Number(value) / 100);
+      }
+      setInputVal(`${prefix}${value}`);
     }
   };
 
@@ -151,19 +127,34 @@ function App() {
       document.documentElement.clientHeight + 'px' || '0';
   }, []);
 
+  const isFontSmall = useMemo(() => {
+    setTimeout(() => {
+      contentRef.current &&
+        contentRef.current.scrollTo(contentRef.current.scrollWidth, 0);
+    }, 10);
+    return inputVal.length > 11;
+  }, [inputVal]);
+
   return (
     <div className={styles.app}>
       <div className={styles.topContent}>
         <ul className={styles.historyContent}>
-          {historyArr.map((item, index) => {
+          {historyArr.map((item) => {
             return (
-              <li key={index} className={styles.historyItem}>
-                {item}
+              <li key={item.createTime} className={styles.historyItem}>
+                {item.content}
               </li>
             );
           })}
         </ul>
-        <div className={styles.inputValContent}>{inputVal}</div>
+        <div
+          ref={contentRef}
+          className={`${styles.inputValContent} ${
+            isFontSmall ? styles.fontSmall : ''
+          }`}
+        >
+          {inputVal}
+        </div>
       </div>
       <div className={styles.bottomContent}>
         {keyLayout.map((item) => {
