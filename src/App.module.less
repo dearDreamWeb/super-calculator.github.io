@@ -13,8 +13,25 @@
   background-color: #000000;
 
   .topContent {
+    display: flex;
     width: 100vw;
     height: 30%;
+    flex-direction: column;
+
+    .historyContent {
+      display: flex;
+      justify-content: flex-end;
+      padding: 12*@vw;
+      flex: 1;
+      flex-direction: column;
+
+      .historyItem {
+        margin-bottom: 8*@vw;
+        width: 100%;
+        font-size: 24*@vw;
+        text-align: right;
+      }
+    }
 
     .inputValContent {
       padding: 0 12*@vw;
