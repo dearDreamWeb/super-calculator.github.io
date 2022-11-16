@@ -1,7 +1,10 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import styles from './App.module.less';
-import { formateNumber, calcHandler } from './utils/tools';
+import { formateNumber, calcHandler, deleteInput } from './utils/tools';
+import keyDown from './assets/audios/keyDown.mp3';
 import moment from 'moment';
+import { ReactComponent as AllowPlay } from './assets/images/allow-play.svg';
+import { ReactComponent as ForbiddenPlay } from './assets/images/forbidden-play.svg';
 
 const backKey = '🔙';
 
@@ -43,7 +46,8 @@ function App() {
   const [historyArr, setHistoryArr] = useState<HistoryItem[]>([]);
   const [operator, setOperator] = useState('');
   const [calcType, setCalcType] = useState<CalcType>('inputting');
-  const contentRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [isMuted, setIsMuted] = useState(true);
 
   /**
    * 计算结果
@@ -119,6 +123,8 @@ function App() {
         value = formateNumber(Number(value) / 100);
       }
       setInputVal(`${prefix}${value}`);
+    } else if (calcType === 'inputting' && str === backKey) {
+      setInputVal(deleteInput(inputVal));
     }
   };
 
@@ -128,15 +134,30 @@ function App() {
   }, []);
 
   const isFontSmall = useMemo(() => {
-    setTimeout(() => {
-      contentRef.current &&
-        contentRef.current.scrollTo(contentRef.current.scrollWidth, 0);
-    }, 10);
     return inputVal.length > 11;
   }, [inputVal]);
 
   return (
     <div className={styles.app}>
+      <audio
+        ref={audioRef}
+        muted={isMuted}
+        src={keyDown}
+        style={{ display: 'none' }}
+      ></audio>
+
+      {isMuted ? (
+        <ForbiddenPlay
+          className={styles.audioIcon}
+          onClick={() => setIsMuted(!isMuted)}
+        />
+      ) : (
+        <AllowPlay
+          className={styles.audioIcon}
+          onClick={() => setIsMuted(!isMuted)}
+        />
+      )}
+
       <div className={styles.topContent}>
         <ul className={styles.historyContent}>
           {historyArr.map((item) => {
@@ -148,7 +169,6 @@ function App() {
           })}
         </ul>
         <div
-          ref={contentRef}
           className={`${styles.inputValContent} ${
             isFontSmall ? styles.fontSmall : ''
           }`}
@@ -156,7 +176,10 @@ function App() {
           {inputVal}
         </div>
       </div>
-      <div className={styles.bottomContent}>
+      <div
+        className={styles.bottomContent}
+        onClick={() => !isMuted && audioRef.current && audioRef.current.play()}
+      >
         {keyLayout.map((item) => {
           return (
             <div key={item} className={styles.keyItem}>

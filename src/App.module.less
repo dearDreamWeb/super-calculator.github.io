@@ -5,12 +5,21 @@
 // font-size: 18*@vw;
 
 .app {
+  position: relative;
   margin-bottom: 0;
   /* stylelint-disable-next-line function-no-unknown */
   margin-bottom: constant(safe-area-inset-bottom);
   margin-bottom: env(safe-area-inset-bottom);
   height: 100%;
   background-color: #000000;
+
+  .audioIcon {
+    position: absolute;
+    top: 8*@vw;
+    left: 8*@vw;
+    width: 28*@vw;
+    height: 28*@vw;
+  }
 
   .topContent {
     display: flex;
@@ -27,22 +36,30 @@
       flex-direction: column;
 
       .historyItem {
+        display: flex;
+        flex-direction: row-reverse;
+        overflow-x: scroll;
         margin-bottom: 8*@vw;
         width: 100%;
         font-size: 24*@vw;
-        text-align: right;
+        white-space: nowrap;
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
       }
     }
 
     .inputValContent {
-      flex-basis: 60*@vw;
-      overflow-x: scroll;
+      display: flex;
+      overflow-x: auto;
       padding: 0 12*@vw;
       width: 100%;
       font-size: 50*@vw;
-      text-align: right;
       white-space: nowrap;
       color: #FFFFFF;
+      flex-direction: row-reverse;
+      flex-basis: 60*@vw;
       box-sizing: border-box;
 
       &.fontSmall {

@@ -72,3 +72,16 @@ export const calcHandler = (str: string) => {
   }
   return result;
 };
+
+export const deleteInput = (str: string) => {
+  if (!str) {
+    return '0';
+  }
+  let len = str.length;
+  if (/\d|\./.test(str[len - 1])) {
+    str = str.slice(0, len - 1);
+  } else if (/\s/.test(str[len - 1])) {
+    str = str.slice(0, len - 3);
+  }
+  return str;
+};

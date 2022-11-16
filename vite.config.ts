@@ -1,10 +1,12 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import eslintPlugin from 'vite-plugin-eslint'; // 引入
+import svgr from 'vite-plugin-svgr';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
+    svgr(),
     react(),
     // 配置eslintPlugin
     eslintPlugin({
