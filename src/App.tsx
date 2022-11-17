@@ -48,7 +48,6 @@ function App() {
   const [inputVal, setInputVal] = useState('0');
   const [historyArr, setHistoryArr] = useState<HistoryItem[]>([]);
   const [calcType, setCalcType] = useState<CalcType>('inputting');
-  const audioRef = useRef<HTMLAudioElement>(null);
   const [isMuted, setIsMuted] = useState(true);
   const [showHistoryPage, setShowHistoryPage] = useState(false);
 
@@ -148,13 +147,6 @@ function App() {
 
   return (
     <div className={styles.app}>
-      <audio
-        ref={audioRef}
-        muted={isMuted}
-        src={keyDown}
-        style={{ display: 'none' }}
-      ></audio>
-
       {isMuted ? (
         <ForbiddenPlay
           className={styles.audioIcon}
@@ -213,13 +205,26 @@ function App() {
           {inputVal}
         </div>
       </div>
-      <div
-        className={styles.bottomContent}
-        onClick={() => !isMuted && audioRef.current && audioRef.current.play()}
-      >
-        {keyLayout.map((item) => {
+      <div className={styles.bottomContent}>
+        {keyLayout.map((item, index) => {
           return (
-            <div key={item} className={styles.keyItem}>
+            <div
+              key={item}
+              className={styles.keyItem}
+              onClick={() => {
+                if (!isMuted) {
+                  (document.querySelector(
+                    `#audio-${index}`
+                  )! as HTMLAudioElement)!.play();
+                }
+              }}
+            >
+              <audio
+                id={`audio-${index}`}
+                muted={isMuted}
+                src={keyDown}
+                style={{ display: 'none' }}
+              ></audio>
               <div
                 className={`${styles.keyItemContent} ${
                   baseFunctionKey.includes(item)

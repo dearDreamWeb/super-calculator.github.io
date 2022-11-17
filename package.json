@@ -9,7 +9,9 @@
     "preview": "vite preview",
     "lint": "eslint src",
     "fix": "eslint src/**/*.*  --fix",
-    "styleLint": "stylelint \"src/**/*.(less|scss|css)\" --fix --custom-syntax postcss-less"
+    "styleLint": "stylelint \"src/**/*.(less|scss|css)\" --fix --custom-syntax postcss-less",
+    "deploy": "rm -rf dist && ./deploy.sh",
+    "deployGitee": "rm -rf dist && ./deployGitee.sh"
   },
   "dependencies": {
     "decimal-eval": "^0.1.1",
