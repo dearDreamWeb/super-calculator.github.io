@@ -21,31 +21,95 @@
     height: 28*@vw;
   }
 
+  .historyIcon {
+    position: absolute;
+    top: 40*@vw;
+    left: 8*@vw;
+    width: 28*@vw;
+    height: 28*@vw;
+    fill: #FFFFFF;
+  }
+
+  .historyModal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    background-color: #000000;
+
+    .closeIcon {
+      position: absolute;
+      top: 8*@vw;
+      right: 8*@vw;
+      width: 28*@vw;
+      height: 28*@vw;
+    }
+
+    .historyMain {
+      display: flex;
+      overflow-y: auto;
+      padding: 12*@vw;
+      height: 100%;
+      flex-direction: column;
+
+      .historyItemBox {
+        margin-top: auto;
+        margin-bottom: 16*@vw;
+
+        .historyCreateTime {
+          font-size: 8*@vw;
+          text-align: right;
+          color: #CCCCCC;
+        }
+
+        .historyContent {
+          display: flex;
+          flex-direction: row-reverse;
+          overflow-x: scroll;
+          margin-bottom: 8*@vw;
+          width: 100%;
+          font-size: 24*@vw;
+          white-space: nowrap;
+
+          &::-webkit-scrollbar {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+
   .topContent {
     display: flex;
     width: 100vw;
     height: 30%;
     flex-direction: column;
 
-    .historyContent {
+    .historyWrapper {
       display: flex;
-      justify-content: flex-end;
-      overflow-y: scroll;
-      padding: 12*@vw;
+      flex-direction: column-reverse;
+      overflow-y: auto;
       height: calc(100% - 60*@vw);
-      flex-direction: column;
 
-      .historyItem {
-        display: flex;
-        flex-direction: row-reverse;
-        overflow-x: scroll;
-        margin-bottom: 8*@vw;
-        width: 100%;
-        font-size: 24*@vw;
-        white-space: nowrap;
+      .historyContent {
+        margin-top: auto;
+        padding: 12*@vw;
 
-        &::-webkit-scrollbar {
-          display: none;
+        .historyItem {
+          display: flex;
+          flex-direction: row-reverse;
+          overflow-x: scroll;
+          margin-top: auto;
+          margin-bottom: 8*@vw;
+          width: 100%;
+          font-size: 24*@vw;
+          white-space: nowrap;
+
+          &::-webkit-scrollbar {
+            display: none;
+          }
         }
       }
     }

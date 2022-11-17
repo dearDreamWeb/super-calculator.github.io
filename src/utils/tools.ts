@@ -1,5 +1,8 @@
-export const formateNumber = (number: number) => {
-  const str = number.toFixed(16).replace(/0+$/, '');
+import { evaluate } from 'decimal-eval';
+
+export const formateNumber = (value: string) => {
+  const str = evaluate(value).replace(/0+$/, '');
+
   return str[str.length - 1] === '.' ? str.slice(0, str.length - 1) : str;
 };
 
@@ -46,13 +49,13 @@ export const calcHandler = (str: string) => {
     let index = operatorArr[k].index - (oldLen - operatorArr.length);
     if (operatorArr[k].type === 'X') {
       numbers[index] = Number(
-        formateNumber(numbers[index] * numbers[index + 1])
+        formateNumber(`${numbers[index]} * ${numbers[index + 1]}`)
       );
       operatorArr.splice(k, 1);
       numbers.splice(index + 1, 1);
     } else if (operatorArr[k].type === '/') {
       numbers[index] = Number(
-        formateNumber(numbers[index] / numbers[index + 1])
+        formateNumber(`${numbers[index]} / ${numbers[index + 1]}`)
       );
       operatorArr.splice(k, 1);
       numbers.splice(index + 1, 1);
@@ -65,9 +68,9 @@ export const calcHandler = (str: string) => {
   for (let l = 1; l < numbers.length; l++) {
     const type = operatorArr[l - 1].type;
     if (type === '+') {
-      result = Number(formateNumber(result + numbers[l]));
+      result = Number(formateNumber(`${result} + ${numbers[l]}`));
     } else if (type === '-') {
-      result = Number(formateNumber(result - numbers[l]));
+      result = Number(formateNumber(`${result} - ${numbers[l]}`));
     }
   }
   return result;

@@ -12,6 +12,7 @@
     "styleLint": "stylelint \"src/**/*.(less|scss|css)\" --fix --custom-syntax postcss-less"
   },
   "dependencies": {
+    "decimal-eval": "^0.1.1",
     "eslint": "^8.25.0",
     "less": "^4.1.3",
     "moment": "^2.29.4",

@@ -5,6 +5,9 @@ import keyDown from './assets/audios/keyDown.mp3';
 import moment from 'moment';
 import { ReactComponent as AllowPlay } from './assets/images/allow-play.svg';
 import { ReactComponent as ForbiddenPlay } from './assets/images/forbidden-play.svg';
+import { ReactComponent as HistoryIcon } from './assets/images/history-icon.svg';
+import { ReactComponent as CloseIcon } from './assets/images/close.svg';
+import { evaluate } from 'decimal-eval';
 
 const backKey = '🔙';
 
@@ -44,10 +47,10 @@ interface HistoryItem {
 function App() {
   const [inputVal, setInputVal] = useState('0');
   const [historyArr, setHistoryArr] = useState<HistoryItem[]>([]);
-  const [operator, setOperator] = useState('');
   const [calcType, setCalcType] = useState<CalcType>('inputting');
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isMuted, setIsMuted] = useState(true);
+  const [showHistoryPage, setShowHistoryPage] = useState(false);
 
   /**
    * 计算结果
@@ -59,14 +62,14 @@ function App() {
       let formateStr = allInput.replace(/\s/g, '');
       return calcHandler(formateStr).toString();
     } else {
-      return formateNumber(Number(allInput));
+      return formateNumber(allInput);
     }
   };
 
   const numberTool = (str: string) => {
     if (baseOperator.includes(str)) {
       setCalcType('calculate');
-      if (calcType === 'inputting') {
+      if (calcType !== 'calculate') {
         setInputVal(`${inputVal} ${str} `);
       }
       return;
@@ -74,14 +77,16 @@ function App() {
     if (str === '=') {
       if (calcType === 'inputting') {
         const result = baseToolHandler(inputVal);
-        setHistoryArr([
+        let newHistory: HistoryItem[] = [
           ...historyArr,
           {
             type: 'result',
-            createTime: moment().format('YYYY-MMMM-DD , hh:mm:ss'),
+            createTime: moment().format('YYYY-MM-DD , hh:mm:ss'),
             content: `${inputVal} = ${result}`,
           },
-        ]);
+        ];
+        setHistoryArr(newHistory);
+        localStorage.setItem('historyData', JSON.stringify(newHistory));
         setCalcType('result');
         setInputVal(result);
       }
@@ -99,31 +104,31 @@ function App() {
     } else if (str === 'AC') {
       setCalcType('inputting');
       setInputVal('0');
-    } else if (calcType === 'inputting' && str === '+/-') {
+    } else if (calcType !== 'result' && str === '+/-') {
       const lastIndex = inputVal.lastIndexOf(' ');
       let value = inputVal;
       let prefix = '';
       if (lastIndex > -1) {
         value = inputVal.slice(lastIndex + 1);
-        value = formateNumber(Number(value) * -1);
+        value = formateNumber(`${value} * ${-1}`);
         prefix = inputVal.slice(0, lastIndex + 1);
       } else {
-        value = formateNumber(Number(value) * -1);
+        value = formateNumber(`${value} * ${-1}`);
       }
       setInputVal(`${prefix}${value}`);
-    } else if (calcType === 'inputting' && str === '%') {
+    } else if (calcType !== 'result' && str === '%') {
       const lastIndex = inputVal.lastIndexOf(' ');
       let value = inputVal;
       let prefix = '';
       if (lastIndex > -1) {
         value = inputVal.slice(lastIndex + 1);
-        value = formateNumber(Number(value) / 100);
+        value = formateNumber(evaluate(`${value} / 100`));
         prefix = inputVal.slice(0, lastIndex + 1);
       } else {
-        value = formateNumber(Number(value) / 100);
+        value = formateNumber(`${value} / 100`);
       }
       setInputVal(`${prefix}${value}`);
-    } else if (calcType === 'inputting' && str === backKey) {
+    } else if (calcType !== 'result' && str === backKey) {
       setInputVal(deleteInput(inputVal));
     }
   };
@@ -131,6 +136,10 @@ function App() {
   useEffect(() => {
     (document!.querySelector('#root')! as HTMLElement).style.height =
       document.documentElement.clientHeight + 'px' || '0';
+
+    let storage = localStorage.getItem('historyData');
+    let storageData = typeof storage === 'string' ? JSON.parse(storage) : [];
+    setHistoryArr(storageData);
   }, []);
 
   const isFontSmall = useMemo(() => {
@@ -158,16 +167,44 @@ function App() {
         />
       )}
 
+      <HistoryIcon
+        className={styles.historyIcon}
+        onClick={() => setShowHistoryPage(true)}
+      />
+
+      {showHistoryPage && (
+        <div className={styles.historyModal}>
+          <CloseIcon
+            className={styles.closeIcon}
+            onClick={() => setShowHistoryPage(false)}
+          />
+          <div className={styles.historyMain}>
+            {historyArr.map((item) => {
+              return (
+                <div key={item.createTime} className={styles.historyItemBox}>
+                  <div className={styles.historyCreateTime}>
+                    {item.createTime}
+                  </div>
+                  <div className={styles.historyContent}>{item.content}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       <div className={styles.topContent}>
-        <ul className={styles.historyContent}>
-          {historyArr.map((item) => {
-            return (
-              <li key={item.createTime} className={styles.historyItem}>
-                {item.content}
-              </li>
-            );
-          })}
-        </ul>
+        <div className={styles.historyWrapper}>
+          <ul className={styles.historyContent}>
+            {historyArr.map((item) => {
+              return (
+                <li key={item.createTime} className={styles.historyItem}>
+                  {item.content}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
         <div
           className={`${styles.inputValContent} ${
             isFontSmall ? styles.fontSmall : ''
