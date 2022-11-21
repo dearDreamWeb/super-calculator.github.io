@@ -14,5 +14,6 @@
 
 <img src="https://resource.blogwxb.cn/superCalculator/calculate_1.png" height="400px"/>
 
-带有日期的历史记录： 
+带有日期的历史记录：   
+
 <img src="https://resource.blogwxb.cn/superCalculator/history.png" height="400px"/>
