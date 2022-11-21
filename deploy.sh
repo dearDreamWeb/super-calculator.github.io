@@ -21,6 +21,6 @@ git remote add origin https://github.com/dearDreamWeb/super-calculator.github.io
 # git push -f git@github.com:<USERNAME>/<USERNAME>.github.io.git master
 
 # 如果你要部署在 https://<USERNAME>.github.io/<REPO>
-git push -f origin master:deploy
+git push -f origin main:deploy
 
 cd -
