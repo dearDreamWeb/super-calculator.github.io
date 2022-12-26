@@ -1,7 +1,7 @@
 import { evaluate } from 'decimal-eval';
 
 export const formateNumber = (value: string) => {
-  const str = evaluate(value).replace(/0+$/, '');
+  const str = evaluate(value).replace(/\.0+$/, '');
 
   return str[str.length - 1] === '.' ? str.slice(0, str.length - 1) : str;
 };
@@ -65,6 +65,7 @@ export const calcHandler = (str: string) => {
   }
 
   let result = numbers[0];
+
   for (let l = 1; l < numbers.length; l++) {
     const type = operatorArr[l - 1].type;
     if (type === '+') {

@@ -39,12 +39,63 @@
     height: 100%;
     background-color: #000000;
 
+    .clearHistory {
+      position: absolute;
+      top: 8*@vw;
+      left: 8*@vw;
+      color: #FF4400;
+    }
+
     .closeIcon {
       position: absolute;
       top: 8*@vw;
       right: 8*@vw;
       width: 28*@vw;
       height: 28*@vw;
+    }
+
+    .confirmBox {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      background: rgb(0 0 0 / 30%);
+
+      .confirmMain {
+        width: 80%;
+        background-color: #FFFFFF;
+
+        h1 {
+          display: flex;
+          justify-content: center;
+          padding: 12*@vw 0;
+          font-size: 20*@vw;
+        }
+
+        .confirmContent {
+          padding: 12*@vw 12*@vw;
+        }
+
+        ul {
+          display: flex;
+
+          li {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1*@vw solid #CCCCCC;
+            width: 50%;
+            height: 36*@vw;
+            font-size: 16*@vw;
+            flex: 1;
+          }
+        }
+      }
     }
 
     .historyMain {

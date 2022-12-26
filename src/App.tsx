@@ -50,6 +50,7 @@ function App() {
   const [calcType, setCalcType] = useState<CalcType>('inputting');
   const [isMuted, setIsMuted] = useState(true);
   const [showHistoryPage, setShowHistoryPage] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   /**
    * 计算结果
@@ -74,6 +75,7 @@ function App() {
       return;
     }
     if (str === '=') {
+      console.log(calcType);
       if (calcType === 'inputting') {
         const result = baseToolHandler(inputVal);
         let newHistory: HistoryItem[] = [
@@ -126,9 +128,15 @@ function App() {
       } else {
         value = formateNumber(`${value} / 100`);
       }
+      setCalcType('inputting');
       setInputVal(`${prefix}${value}`);
     } else if (calcType !== 'result' && str === backKey) {
-      setInputVal(deleteInput(inputVal));
+      const newValue = deleteInput(inputVal);
+      setInputVal(newValue);
+      const endStr = newValue.slice(newValue.length - 1);
+      if (/\.|\d/.test(endStr)) {
+        setCalcType('inputting');
+      }
     }
   };
 
@@ -141,9 +149,21 @@ function App() {
     setHistoryArr(storageData);
   }, []);
 
+  /**
+   * 判断内容的长度，是否要显示小字体
+   */
   const isFontSmall = useMemo(() => {
     return inputVal.length > 11;
   }, [inputVal]);
+
+  /**
+   * 清除历史记录
+   */
+  const clearHistoryHandler = () => {
+    localStorage.removeItem('historyData');
+    setHistoryArr([]);
+    setShowConfirm(false);
+  };
 
   return (
     <div className={styles.app}>
@@ -166,6 +186,28 @@ function App() {
 
       {showHistoryPage && (
         <div className={styles.historyModal}>
+          <div
+            hidden={!historyArr.length}
+            className={styles.clearHistory}
+            onClick={() => setShowConfirm(true)}
+          >
+            清除历史记录
+          </div>
+          {showConfirm && (
+            <div className={styles.confirmBox}>
+              <div className={styles.confirmMain}>
+                <h1>提示</h1>
+                <div className={styles.confirmContent}>
+                  历史记录一旦清除，无法恢复，确定清除？
+                </div>
+                <ul>
+                  <li onClick={() => setShowConfirm(false)}>取消</li>
+                  <li onClick={clearHistoryHandler}>确定</li>
+                </ul>
+              </div>
+            </div>
+          )}
+
           <CloseIcon
             className={styles.closeIcon}
             onClick={() => setShowHistoryPage(false)}
